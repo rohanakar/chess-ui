@@ -4,11 +4,11 @@ import { Spot } from "./Spot";
 
 export class Move{
 
-    private player:Player;
-    private initialSpot:Spot;
-    private finalSpot:Spot;
-    private pieceKilled:Piece;
-    private castlingMove:boolean;
+    private player: Player = new Player;
+    private initialSpot!: Spot;
+    private finalSpot!: Spot;
+    private pieceKilled!: Piece;
+    private castlingMove: boolean = false;
 
     public getPlayer(): Player {
         return this.player;

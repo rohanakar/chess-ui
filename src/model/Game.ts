@@ -1,3 +1,4 @@
+import BoardGenerator from "../utils/BoardGenerator";
 import { Board } from "./Board";
 import { GameState } from "./GameState";
 import { Move } from "./Move";
@@ -5,11 +6,15 @@ import { Player } from "./Player";
 
 export class Game{
 
-    private board:Board;
-    private players:Player[][];
-    private gameState:GameState;
-    private movesPlayed : Move[];
-    private currentTurn : boolean;
+    private board: Board = new Board;
+    private players: Player[][] = [];
+    private gameState: GameState = 0;
+    private movesPlayed: Move[] = [];
+    private currentTurn: boolean = false;
+
+    constructor(){
+        this.board = new BoardGenerator().getBoard();
+    }
 
     public getBoard(): Board {
         return this.board;

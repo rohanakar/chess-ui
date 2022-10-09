@@ -1,10 +1,10 @@
 import React from 'react';
 import './App.css';
-import Board from './components/Board';
+import Main from './screen/Main';
 
 function App() {
   return (
-    <Board></Board>
+    <Main/>
   );
 }
 

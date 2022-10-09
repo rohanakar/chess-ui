@@ -2,9 +2,9 @@ import { Game } from "./Game";
 
 export class Player{
     
-    private name:string;
-    private rating:number;
-    private matches:Game[];
+    private name!: string;
+    private rating!: number;
+    private matches!: Game[];
 
     public getName(): string {
         return this.name;

@@ -1,16 +1,19 @@
 import React from "react";
+import { Spot } from "../model/Spot";
 
-export const renderList = (list:Array<any>,renderCell:Function) => {
+export const renderList = (list:Array<Spot>,rowNum:number) => {
     let op: any = [];
+    let colNum=rowNum*8;;
     list.forEach(e=>{
-        op.push(renderCell(e,renderCell));
+        op.push(e.render(colNum));
+        colNum++;
     })
-    return (<div className="row">{op}</div>);
+    return (<div className="row" key={rowNum}>{op}</div>);
 }
 
-export const render2DList = (list:Array<Array<any>>,renderCell:Function) =>{
+export const render2DList = (list:Array<Array<any>>) =>{
     let op: Array<any> = [];
-    list.forEach(e=>op.push(renderList(e,renderCell)));
-    console.log(op);
+    let rowNum=0;
+    list.forEach(e=>op.push(renderList(e,rowNum++)));
     return op;
 }

@@ -4,7 +4,7 @@ import { PieceType } from "./PieceType";
 export class King extends Piece{
 
     private castlingDone: boolean;
-    private spotIncrement :Array<Array<any>>;
+    private spotIncrement: Array<Array<any>> = [];
 
     public canCastle(): boolean {
         return !this.castlingDone;
@@ -14,8 +14,8 @@ export class King extends Piece{
         this.castlingDone = true;
     }
 
-    constructor(){
-        super(PieceType.KING,9999);
+    constructor(isWhite: boolean){
+        super(PieceType.KING,9999,isWhite);
         this.castlingDone = false;
         for(let i=-1;i<=1;i++){
             let array = [];
@@ -28,16 +28,16 @@ export class King extends Piece{
         }
     }
 
-    public canMove: boolean;
+    public canMove: boolean = false;
 
 }
 
 export class Queen extends Piece{
 
-    private beanIncrement : Array<Array<any>>;
+    private beanIncrement: Array<Array<any>> = [];
 
-    constructor(){
-        super(PieceType.QUEEN,9);
+    constructor(isWhite:boolean){
+        super(PieceType.QUEEN,9,isWhite);
 
         for(let i=-1;i<=1;i++){
             let array = [];
@@ -49,7 +49,7 @@ export class Queen extends Piece{
             this.beanIncrement.push(array);
         }
     }
-    public canMove: boolean;
+    public canMove: boolean = false;
 
 }
 
@@ -60,10 +60,10 @@ export class Pawn extends Piece{
     SPOT_INCREMENTS_TAKE = [[-1,1],[1,1]]
 
 
-    constructor(){
-        super(PieceType.PAWN,1);
+    constructor(isWhite: boolean){
+        super(PieceType.PAWN,1,isWhite);
     }
-    public canMove: boolean;
+    public canMove: boolean = false;
 
 }
 
@@ -71,19 +71,19 @@ export class Rook extends Piece{
 
     BEAN_INCREMENT = [[-1,0],[1,0],[0,-1],[0,1]]
 
-    constructor(){
-        super(PieceType.ROOK,5);
+    constructor(isWhite: boolean){
+        super(PieceType.ROOK,5,isWhite);
     }
-    public canMove: boolean;
+    public canMove: boolean = false;
 
 }
 
 export class Bishop extends Piece{
 
-    constructor(){
-        super(PieceType.BISHOP,3);
+    constructor(isWhite: boolean){
+        super(PieceType.BISHOP,3,isWhite);
     }
-    public canMove: boolean;
+    public canMove: boolean = false;
 
 }
 
@@ -91,9 +91,9 @@ export class Knight extends Piece{
 
     SPOT_INCREMENTS = [[2, 1], [2, -1], [-2, 1], [-2, -1], [1, 2], [1, -2], [-1, 2], [-1, -2]]
 
-    constructor(){
-        super(PieceType.KNIGHT,3);
+    constructor(isWhite: boolean){
+        super(PieceType.KNIGHT,3,isWhite);
     }
-    public canMove: boolean;
+    public canMove: boolean = false;
 
 }
