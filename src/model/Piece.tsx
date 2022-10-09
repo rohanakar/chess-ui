@@ -54,15 +54,70 @@ export abstract class Piece {
         console.log("rendering piece");
 
         return <div className={this.white?'white piece':'black piece'} >
-           {getImage(this.pieceType)}
+           {GetImage(this.pieceType)}
         </div> ;
     };
 
 }
 
-const getImage = (piece: PieceType) => {
+const GetImage = (piece: PieceType) => {
     let Node = getImageFile(piece);
-    return <Node/>
+
+    const ref = useRef<SVGSVGElement>(null);
+
+    const [state,setState] = useState({
+        dragging:false,
+        inital:{x:0,y:0}
+    });
+
+    const[global,setGlobalCoords] = useState({x:0,y:0});
+
+    useEffect(() => {
+        // 👇️ get global mouse coordinates
+        const handleWindowMouseMove = (event: { clientX: any; clientY: any; }) => {
+          setGlobalCoords({
+            x: event.clientX,
+            y: event.clientY,
+          });
+        };
+        window.addEventListener('mousemove', handleWindowMouseMove);
+    
+        return () => {
+          window.removeEventListener('mousemove', handleWindowMouseMove);
+        };
+      }, []);
+
+    const style = state.dragging?{top:global.y-state.inital.y,left:global.x-state.inital.x}:{};
+
+    return <Node 
+                style={style}
+                ref={ref}
+                onMouseDown={(e)=>{
+                    console.log(e.clientX +" "+e.clientY);
+                    let x=e.clientX;
+                    let y=e.clientY;
+                    
+                    if(ref.current!=null){
+                        let box = ref.current.getBoundingClientRect();
+                        x-=box.left;
+                        y-=box.top;
+                    }
+                    setState({...state,
+                        dragging:true,
+                        inital:{x,y}
+                    });
+                }}    
+                onMouseUp={(e)=>{
+                    console.log(e.clientX +" "+e.clientY);
+                    setState({...state,
+                        dragging:false,
+                        inital:{x:0,y:0}
+                    });
+
+                }}  
+                
+                
+            />
 }
 
 const getImageFile = (piece: PieceType) => {

@@ -13,10 +13,10 @@ export class Spot{
 
         
         console.log("endering spot %d %d",r,c);
-
+        const Child = ()=>{return this.getPiece()?.render()}
         return (
             <div className={`${cName} cell`} key={colNum} >
-                {this.getPiece()?.render()}
+                <Child/>
             </div>
         )
     }

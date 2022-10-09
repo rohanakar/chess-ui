@@ -12,12 +12,12 @@ const Board = (props: { board: BoardModel; }) => {
     console.log("rendering board");
     
     return (
-        <>
+        <div className="board">
             {
                 render2DList(board.getSpots())
             }
-
-    </>)
+        </div>
+    )
 
 }
 
