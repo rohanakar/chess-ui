@@ -10,11 +10,12 @@ const Board = (props: { board: BoardModel; }) => {
     const board = props.board;
 
     console.log("rendering board");
-    
+    const [active,setActive] = useState({i:-1,j:-1,initial:{x:0,y:0}});
+    console.log(active);
     return (
         <div className="board">
             {
-                render2DList(board.getSpots())
+                render2DList(board.getSpots(),[active,setActive])
             }
         </div>
     )
