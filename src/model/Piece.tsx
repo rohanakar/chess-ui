@@ -9,11 +9,16 @@ import { useContext, useEffect, useRef, useState } from "react";
 import { Spot } from "./Spot";
 import { AppContext } from "../redux/AppProvider";
 import { MouseContext } from "../redux/MouseFactory";
+import { King } from "./ChessPiece";
 
 export abstract class Piece {
+    abstract canMove( curr: { i:  number; j:  number; },
+                    next:{ i:  number; j:  number; },
+                    board:Spot[][]):boolean
 
     private pieceType: PieceType;
     private value: number;
+    private moved = false;
     private alive: boolean = true;
     private white: boolean = false;
 
@@ -21,6 +26,12 @@ export abstract class Piece {
         this.pieceType = pieceType;
         this.value = value;
         this.white = isWhite;
+    }
+
+    public getMoved = () => this.moved;
+
+    public setMoved = (moved:boolean) => {
+        this.moved=moved;
     }
 
     public getPieceType(): PieceType {
@@ -47,29 +58,49 @@ export abstract class Piece {
         this.white = white;
     }
 
-    public abstract canMove: boolean;
-
     public render: any = (currIJ:any,active:any,updateActive:any) => {
 
         const [state,setState] = useContext(AppContext);
 
         const validateAndUpdateBoard = (current:any,mouse:{x:number,y:number},prev:any)=>{
-            if(!this.canMove){
+
                 current.style.pointerEvents ='none';
-                const [i,j] = getSpot(mouse.x,mouse.y,prev.i+" "+prev.j);
+                const curr = getSpot(mouse.x,mouse.y,prev.i+" "+prev.j);
                 current.style.pointerEvents = '';
                 let game = state.game;
-                let prevPiece = game.getBoard().getSpots()[prev.i][prev.j].getPiece();
-                if(!i)
+                let prevPiece:Piece = game.getBoard().getSpots()[prev.i][prev.j].getPiece();
+                if(!curr.i )
+                    return;
+                if(!this.canMove(prev,curr,game.getBoard().getSpots())){
+                    if(this.pieceType === PieceType.KING){
+                        let x:any = this;
+                        if((x as King).canCastle(game.getBoard().getSpots(),prev,curr)){
+                            let prevPiece:Piece = game.getBoard().getSpots()[prev.i][prev.j].getPiece();
+                            let currPiece:Piece = game.getBoard().getSpots()[curr.i][(curr.j>prev.j&&this.isWhite())?7:0].getPiece();
+                            game.getBoard().getSpots()[prev.i][(+curr.j)+((+curr.j)>prev.j?-1:1)].setPiece(currPiece);
+                            game.getBoard().getSpots()[curr.i][curr.j].setPiece(prevPiece);
+
+
+                            game.getBoard().getSpots()[prev.i][prev.j].setPiece(null);
+                            game.getBoard().getSpots()[curr.i][(+curr.j)>prev.j?7:0].setPiece(null);
+
+                            prevPiece.setMoved(true);
+                            currPiece.setMoved(true);
+                            setState({game})
+                            return;
+                        }
+                    }
+                }
+                
+                if(!this.canMove(prev,curr,game.getBoard().getSpots()))
                     return;
                 game.getBoard().getSpots()[prev.i][prev.j].setPiece(null);
-                game.getBoard().getSpots()[i][j].setPiece(prevPiece);
-                console.error(prev);
-                console.error('move to');
-                console.error(i,j);
-
+                game.getBoard().getSpots()[curr.i][curr.j].getPiece()?.setAlive(false);
+                game.getBoard().getSpots()[curr.i][curr.j].setPiece(prevPiece);
+                prevPiece.setMoved(true);
+               
                 setState({game})
-            }
+
         }
 
         return <div className={this.white?'white piece':'black piece'} >
@@ -137,7 +168,7 @@ const getImageFile = (piece: PieceType) => {
     }
 }
 
-function getSpot(x: number, y: number,currentIndice:string):[any,any]{
+function getSpot(x: number, y: number,currentIndice:string):{i:number,j: number}{
     
     let stack = [];
     let elementMouseIsOver:any = document.elementFromPoint(x, y)!;
@@ -165,7 +196,7 @@ for (; i < il; i += 1) {
     return getIndice(node);
 }
 
-function getIndice(node: Element|null|undefined ):[any,any]{
+function getIndice(node: Element|null|undefined ):{i: any,j: any}{
     let classList:any  = node?.classList.value.split(" ");
-    return [classList[2],classList[3]];
+    return {i:classList[2],j:classList[3]};
 }
