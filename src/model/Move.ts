@@ -1,6 +1,6 @@
-import { Piece } from "./Piece";
+import { Piece } from "../components/Piece";
 import { Player } from "./Player";
-import { Spot } from "./Spot";
+import { Spot } from "../components/Spot";
 
 export class Move{
 

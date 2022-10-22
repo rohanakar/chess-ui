@@ -1,4 +1,4 @@
-import { PieceType } from "./PieceType";
+import { PieceType } from "../model/PieceType";
 import { ReactComponent as KingSVG }from '../assets/king.svg'; 
 import { ReactComponent as QueenSVG } from '../assets/queen.svg'; 
 import { ReactComponent as RookSVG } from '../assets/rook.svg'; 
@@ -7,13 +7,13 @@ import { ReactComponent as KnightSVG } from '../assets/knight.svg';
 import { ReactComponent as PawnSVG } from '../assets/pawn.svg'; 
 import { useContext, useEffect, useRef, useState } from "react";
 import { Spot } from "./Spot";
-import { AppContext } from "../redux/AppProvider";
 import { MouseContext } from "../redux/MouseFactory";
-import { King } from "./ChessPiece";
+import { King } from "../model/ChessPiece";
+import { Position } from "../types/Position";
 
 export abstract class Piece {
-    abstract canMove( curr: { i:  number; j:  number; },
-                    next:{ i:  number; j:  number; },
+    abstract canMove( curr: Position,
+                    next:Position,
                     board:Spot[][]):boolean
 
     private pieceType: PieceType;
@@ -21,6 +21,8 @@ export abstract class Piece {
     private moved = false;
     private alive: boolean = true;
     private white: boolean = false;
+    private position!: Position;
+
 
     constructor(pieceType: PieceType, value: number, isWhite: boolean) {
         this.pieceType = pieceType;
@@ -58,54 +60,67 @@ export abstract class Piece {
         this.white = white;
     }
 
-    public render: any = (currIJ:any,active:any,updateActive:any) => {
+    public getPosition = ()=>{
+        return this.position;
+    }
 
-        const [state,setState] = useContext(AppContext);
+    public setPosition = (position:Position) => {
+        this.position = position;
+    }
 
-        const validateAndUpdateBoard = (current:any,mouse:{x:number,y:number},prev:any)=>{
-
-                current.style.pointerEvents ='none';
-                const curr = getSpot(mouse.x,mouse.y,prev.i+" "+prev.j);
-                current.style.pointerEvents = '';
-                let game = state.game;
-                let prevPiece:Piece = game.getBoard().getSpots()[prev.i][prev.j].getPiece();
-                if(!curr.i )
-                    return;
-                if(!this.canMove(prev,curr,game.getBoard().getSpots())){
-                    if(this.pieceType === PieceType.KING){
-                        let x:any = this;
-                        if((x as King).canCastle(game.getBoard().getSpots(),prev,curr)){
-                            let prevPiece:Piece = game.getBoard().getSpots()[prev.i][prev.j].getPiece();
-                            let currPiece:Piece = game.getBoard().getSpots()[curr.i][(curr.j>prev.j&&this.isWhite())?7:0].getPiece();
-                            game.getBoard().getSpots()[prev.i][(+curr.j)+((+curr.j)>prev.j?-1:1)].setPiece(currPiece);
-                            game.getBoard().getSpots()[curr.i][curr.j].setPiece(prevPiece);
+    public render: any = () => {
 
 
-                            game.getBoard().getSpots()[prev.i][prev.j].setPiece(null);
-                            game.getBoard().getSpots()[curr.i][(+curr.j)>prev.j?7:0].setPiece(null);
+        // const validateAndUpdateBoard = (current:any,mouse:{x:number,y:number},prev:any)=>{
 
-                            prevPiece.setMoved(true);
-                            currPiece.setMoved(true);
-                            setState({game})
-                            return;
-                        }
-                    }
-                }
+        //         current.style.pointerEvents ='none';
+        //         const curr = getSpot(mouse.x,mouse.y,prev.i+" "+prev.j);
+        //         current.style.pointerEvents = '';
+        //         let game = state.game;
+        //         let prevPiece:Piece = game.getBoard().getSpots()[prev.i][prev.j].getPiece();
+        //         if(!curr.i )
+        //             return;
+        //         if(!this.canMove(prev,curr,game.getBoard().getSpots())){
+        //             if(this.pieceType === PieceType.KING){
+        //                 let x:any = this;
+        //                 if((x as King).canCastle(game.getBoard().getSpots(),prev,curr)){
+        //                     let prevPiece:Piece = game.getBoard().getSpots()[prev.i][prev.j].getPiece();
+        //                     let currPiece:Piece = game.getBoard().getSpots()[curr.i][(curr.j>prev.j&&this.isWhite())?7:0].getPiece();
+        //                     game.getBoard().getSpots()[prev.i][(+curr.j)+((+curr.j)>prev.j?-1:1)].setPiece(currPiece);
+        //                     game.getBoard().getSpots()[curr.i][curr.j].setPiece(prevPiece);
+
+
+        //                     game.getBoard().getSpots()[prev.i][prev.j].setPiece(null);
+        //                     game.getBoard().getSpots()[curr.i][(+curr.j)>prev.j?7:0].setPiece(null);
+
+        //                     prevPiece.setMoved(true);
+        //                     currPiece.setMoved(true);
+        //                     setState({game})
+        //                     return;
+        //                 }
+        //             }
+        //         }
                 
-                if(!this.canMove(prev,curr,game.getBoard().getSpots()))
-                    return;
-                game.getBoard().getSpots()[prev.i][prev.j].setPiece(null);
-                game.getBoard().getSpots()[curr.i][curr.j].getPiece()?.setAlive(false);
-                game.getBoard().getSpots()[curr.i][curr.j].setPiece(prevPiece);
-                prevPiece.setMoved(true);
+        //         if(!this.canMove(prev,curr,game.getBoard().getSpots()))
+        //             return;
+        //         game.getBoard().getSpots()[prev.i][prev.j].setPiece(null);
+        //         game.getBoard().getSpots()[curr.i][curr.j].getPiece()?.setAlive(false);
+        //         game.getBoard().getSpots()[curr.i][curr.j].setPiece(prevPiece);
+        //         prevPiece.setMoved(true);
                
-                setState({game})
+        //         setState({game})
 
-        }
-
-        return <div className={this.white?'white piece':'black piece'} >
-           {GetImage(this.pieceType,validateAndUpdateBoard,active,updateActive,currIJ)}
-        </div> ;
+        // }
+        let Node = getImageFile(this.pieceType);
+        return <div 
+                draggable={true} 
+                className={this.white?'white piece':'black piece'} 
+                onDragStart={(e:any)=>{
+                    e.dataTransfer.setData("initial", JSON.stringify(this.getPosition()))
+                }}
+            >
+                    <Node/>
+            </div> ;
     };
 
 }

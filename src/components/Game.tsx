@@ -1,16 +1,20 @@
 import BoardGenerator from "../utils/BoardGenerator";
 import { Board } from "./Board";
-import { GameState } from "./GameState";
-import { Move } from "./Move";
-import { Player } from "./Player";
+import { GameState } from "../model/GameState";
+import { Move } from "../model/Move";
+import { Player } from "../model/Player";
 
 export class Game{
 
+    renderBoard = () => {
+        return <div className="board">{this.board.render()}</div>;
+    }
+
     private board: Board = new Board;
-    private players: Player[][] = [];
+    private players: Player[] = [];
     private gameState: GameState = 0;
     private movesPlayed: Move[] = [];
-    private currentTurn: boolean = false;
+    private currentTurn: number = 0;
 
     constructor(){
         this.board = new BoardGenerator().getBoard();
@@ -24,11 +28,11 @@ export class Game{
         this.board = board;
     }
 
-    public getPlayers(): Player[][] {
+    public getPlayers(): Player[] {
         return this.players;
     }
 
-    public setPlayers(players: Player[][]): void {
+    public setPlayers(players: Player[]): void {
         this.players = players;
     }
 
@@ -48,11 +52,11 @@ export class Game{
         this.movesPlayed = movesPlayed;
     }
 
-    public isCurrentTurn(): boolean {
+    public isCurrentTurn(): number {
         return this.currentTurn;
     }
 
-    public setCurrentTurn(currentTurn: boolean): void {
+    public setCurrentTurn(currentTurn: number): void {
         this.currentTurn = currentTurn;
     }
 

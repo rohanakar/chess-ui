@@ -1,29 +1,30 @@
-import { Piece } from "./Piece";
+import { Piece } from "../components/Piece";
 import { PieceType } from "./PieceType";
-import { Spot } from "./Spot";
+import { Spot } from "../components/Spot";
+import { Position } from "../types/Position";
 
 export class King extends Piece{
    
     private spotIncrement: Array<Array<any>> = [];
 
-    public canCastle(board:Spot[][],curr:{i:number,j:number},next:{i:number,j:number}): boolean {
-        if(Math.abs(next.j-curr.j)!==2)
+    public canCastle(board:Spot[][],curr:Position,next:Position): boolean {
+        if(Math.abs(next.y-curr.y)!==2)
             return false;
         
-        if(board[curr.i][curr.j].getPiece()?.getMoved())
+        if(board[curr.x][curr.y].getPiece()?.getMoved())
             return false;
         
-        let unableToCastleLeft = !board[curr.i][0].getPiece() || board[curr.i][0].getPiece()?.getMoved();
-        let unableToCastleRight = !board[curr.i][7].getPiece() || board[curr.i][7].getPiece()?.getMoved();
-        if(!board[curr.i][0].getPiece()?.getMoved()){
+        let unableToCastleLeft = !board[curr.x][0].getPiece() || board[curr.x][0].getPiece()?.getMoved();
+        let unableToCastleRight = !board[curr.x][7].getPiece() || board[curr.x][7].getPiece()?.getMoved();
+        if(!board[curr.x][0].getPiece()?.getMoved()){
             for(let j of [1,2,3])
-                if( board[curr.i][j].getPiece())
+                if( board[curr.x][j].getPiece())
                     unableToCastleLeft = true;
         }
 
-        if(!board[curr.i][7].getPiece()?.getMoved()){
+        if(!board[curr.x][7].getPiece()?.getMoved()){
             for(let j of [5,6])
-                if( board[curr.i][j].getPiece())
+                if( board[curr.x][j].getPiece())
                     unableToCastleRight = true;
         }
            
@@ -41,14 +42,14 @@ export class King extends Piece{
         }
     }
 
-    canMove = (curr: { i: number; j: number; },
-        next: { i: number; j: number; },
+    canMove = (curr: Position,
+        next: Position,
          board: Spot[][]) => {
 
-        let pieceNext = board[next.i][next.j].getPiece();
+        let pieceNext = board[next.x][next.y].getPiece();
         if(pieceNext && pieceNext.isWhite() === this.isWhite())
            return false;
-        return contains(this.spotIncrement,next.i-curr.i,next.j-curr.j)
+        return contains(this.spotIncrement,next.x-curr.x,next.y-curr.y)
    }
 
 
@@ -70,11 +71,11 @@ export class Queen extends Piece{
         }
     }
 
-    canMove = (curr: { i: number; j: number; },
-        next: { i: number; j: number; },
+    canMove = (curr : Position,
+        next : Position,
          board: Spot[][]) => {
 
-        let pieceNext = board[next.i][next.j].getPiece();
+        let pieceNext = board[next.x][next.y].getPiece();
         if(pieceNext && pieceNext.isWhite() === this.isWhite())
            return false;
         return containsBean(this.beanIncrement,curr,next,board);
@@ -94,17 +95,17 @@ export class Pawn extends Piece{
         super(PieceType.PAWN,1,isWhite);
     }
    
-    canMove = (curr: { i: number; j: number; },
-        next: { i: number; j: number; },
+    canMove = (curr : Position,
+        next : Position,
          board: Spot[][]) => {
 
-        let pieceNext = board[next.i][next.j].getPiece();
+        let pieceNext = board[next.x][next.y].getPiece();
         if(pieceNext && pieceNext.isWhite() === this.isWhite())
            return false;
         
         let op = false; 
-        let delI = next.i-curr.i;
-        let delJ = next.j-curr.j;
+        let delI = next.x-curr.x;
+        let delJ = next.y-curr.y;
         if(!this.isWhite()){
             delI*=-1;
             delJ*=-1;
@@ -129,11 +130,11 @@ export class Rook extends Piece{
         super(PieceType.ROOK,5,isWhite);
     }
    
-    canMove = (curr: { i: number; j: number; },
-        next: { i: number; j: number; },
+    canMove = (curr : Position,
+        next : Position,
          board: Spot[][]) => {
 
-        let pieceNext = board[next.i][next.j].getPiece();
+        let pieceNext = board[next.x][next.y].getPiece();
         if(pieceNext && pieceNext.isWhite() === this.isWhite())
            return false;
         return containsBean(this.BEAN_INCREMENT,curr,next,board);
@@ -149,11 +150,11 @@ export class Bishop extends Piece{
         super(PieceType.BISHOP,3,isWhite);
     }
 
-    canMove = (curr: { i: number; j: number; },
-        next: { i: number; j: number; },
+    canMove = (curr : Position,
+        next : Position,
          board: Spot[][]) => {
 
-        let pieceNext = board[next.i][next.j].getPiece();
+        let pieceNext = board[next.x][next.y].getPiece();
         if(pieceNext && pieceNext.isWhite() === this.isWhite())
            return false;
         return containsBean(this.BEAN_INCREMENT,curr,next,board);
@@ -171,14 +172,14 @@ export class Knight extends Piece{
         super(PieceType.KNIGHT,3,isWhite);
     }
 
-    canMove = (curr: { i: number; j: number; },
-        next: { i: number; j: number; },
+    canMove = (curr : Position,
+        next : Position,
          board: Spot[][]) => {
 
-        let pieceNext = board[next.i][next.j].getPiece();
+        let pieceNext = board[next.x][next.y].getPiece();
         if(pieceNext && pieceNext.isWhite() === this.isWhite())
            return false;
-        return contains(this.SPOT_INCREMENTS,next.i-curr.i,next.j-curr.j)
+        return contains(this.SPOT_INCREMENTS,next.x-curr.x,next.y-curr.y)
    }
    
 
@@ -188,11 +189,12 @@ function contains(moves: number[][], y: number, x: number) {
     return moves.some(e=>e.toString()===[x,y].toString());
 }   
 
-function containsBean(moves: number[][], curr: { j: number; i: number; },next: { j: number; i: number; },board:Spot[][]) {
+function containsBean(moves: number[][], curr: Position,next: Position,board:Spot[][]) {
 
-    const delX = next.i-curr.i;
-    const delY = next.j-curr.j
+    const delX = next.x-curr.x;
+    const delY = next.y-curr.y
 
+    /* <---- delY ---->*/ 
     let x = delX==0?0:delX>0?1:-1;
     let y = delY==0?0:delY>0?1:-1;
 
@@ -203,8 +205,8 @@ function containsBean(moves: number[][], curr: { j: number; i: number; },next: {
     
     for(let move of moves){
         if(move[0] == x && move[1] == y){
-            for(let i=curr.i+move[0],j=curr.j+move[1];i>=0&&i<8&&j>=0&&j<8 ; i+=move[0],j+=move[1]){
-                if(i==next.i&&j==next.j)
+            for(let i=curr.x+move[0],j=curr.y+move[1];i>=0&&i<8&&j>=0&&j<8 ; i+=move[0],j+=move[1]){
+                if(i==next.x&&j==next.y)
                     break;
                 if(board[i][j].getPiece())
                     return false;

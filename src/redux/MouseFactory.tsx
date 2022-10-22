@@ -1,5 +1,5 @@
 import { createContext, useEffect, useState } from 'react';
-import { Game } from '../model/Game';
+import { Game } from '../components/Game';
 
 //create a context, with createContext api
 

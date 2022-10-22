@@ -1,8 +1,8 @@
-import { Board } from "../model/Board";
+import { Board } from "../components/Board";
 import { King, Queen, Rook, Bishop, Pawn, Knight } from "../model/ChessPiece";
-import { Piece } from "../model/Piece";
+import { Piece } from "../components/Piece";
 import { PieceType } from "../model/PieceType";
-import { Spot } from "../model/Spot";
+import { Spot } from "../components/Spot";
 
 const getPiece = (piece: PieceType, isWhite: boolean) => {
     switch (piece) {
@@ -22,6 +22,11 @@ const getPiece = (piece: PieceType, isWhite: boolean) => {
 }
 
 class BoardGenerator{
+
+    /*
+   
+      00 10 20
+    */
 
 
     private board : Board ;
