@@ -4,10 +4,12 @@ import { GameState } from "../model/GameState";
 import { Move } from "../model/Move";
 import { Player } from "../model/Player";
 
-export class Game{
+export class Game {
 
-    renderBoard = () => {
-        return <div className="board">{this.board.render()}</div>;
+    render = () => {
+        return <><div className="board">{this.getBoard().render()}</div>
+            { this.getMovesPlayed().reduce((prev,curr,currInd,moves)=>prev+ " " +curr.getString(),"")}
+        </>;
     }
 
     private board: Board = new Board;
@@ -16,7 +18,7 @@ export class Game{
     private movesPlayed: Move[] = [];
     private currentTurn: number = 0;
 
-    constructor(){
+    constructor() {
         this.board = new BoardGenerator().getBoard();
     }
 
@@ -52,7 +54,7 @@ export class Game{
         this.movesPlayed = movesPlayed;
     }
 
-    public isCurrentTurn(): number {
+    public getCurrentTurn(): number {
         return this.currentTurn;
     }
 
@@ -60,5 +62,5 @@ export class Game{
         this.currentTurn = currentTurn;
     }
 
-    
+
 }

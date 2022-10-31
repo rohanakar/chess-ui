@@ -1,15 +1,18 @@
+import _ from "lodash";
 import { useContext, useState } from "react";
 import { King } from "../model/ChessPiece";
+import { Move } from "../model/Move";
 import { PieceType } from "../model/PieceType";
 import { AppContext } from "../redux/AppProvider";
 import { Position } from "../types/Position";
 import { Board } from "./Board";
+import { Game } from "./Game";
 import { Piece } from "./Piece";
 
 export class Spot{
 
-    position:Position ;
-    updatePiece?:Function;
+    private position:Position ;
+    private piece?:Piece ;
 
     getPosition = ():Position => {
         return this.position;
@@ -18,8 +21,8 @@ export class Spot{
 
     render = ()=> {
         
-        const [state,updateState] = useContext(AppContext);
-        const game = state.game;
+        const [state,updateGame] = useContext(AppContext);
+        const game:Game = state.curr;
 
         let {x:row,y:col} = this.position;
         
@@ -39,28 +42,45 @@ export class Spot{
                         e.preventDefault();
                         var initial = JSON.parse (e.dataTransfer.getData("initial")) as Position;
                         
-                        let initialPiece :Piece= game.getBoard().getSpots()[initial.x][initial.y].getPiece();
+                        let initialPiece :Piece= game.getBoard().getSpots()[initial.x][initial.y].getPiece() as Piece;
                         
                 let prev = initial;
                 let curr = this.getPosition(); 
                 if(prev.x==curr.x && prev.y == curr.y)
                     return;       
+
+                if(initialPiece.isWhite() && game.getCurrentTurn() !==0) 
+                    return ;    
+                
+                if(!initialPiece.isWhite() && game.getCurrentTurn()!==1)
+                    return ;    
+
                 if(!initialPiece.canMove(prev,curr,game.getBoard().getSpots())){
                     if(initialPiece.getPieceType() === PieceType.KING){
                         let x:any = initialPiece;
                         if((x as King).canCastle(game.getBoard().getSpots(),prev,curr)){
-                            let prevPiece:Piece = game.getBoard().getSpots()[prev.x][prev.y].getPiece();
-                            let currPiece:Piece = game.getBoard().getSpots()[curr.x][(curr.y>prev.y&&initialPiece.isWhite())?7:0].getPiece();
+                            let prevPiece:Piece = game.getBoard().getSpots()[prev.x][prev.y].getPiece() as Piece;
+                            let currPiece:Piece|undefined = game.getBoard().getSpots()[curr.x][(curr.y>prev.y&&initialPiece.isWhite())?7:0].getPiece();
                             game.getBoard().getSpots()[prev.x][(+curr.y)+((+curr.y)>prev.y?-1:1)].setPiece(currPiece);
                             game.getBoard().getSpots()[curr.x][curr.y].setPiece(prevPiece);
 
 
-                            game.getBoard().getSpots()[prev.x][prev.y].setPiece(null);
-                            game.getBoard().getSpots()[curr.x][(+curr.y)>prev.y?7:0].setPiece(null);
+                            game.getBoard().getSpots()[prev.x][prev.y].setPiece(undefined);
+                            game.getBoard().getSpots()[curr.x][(+curr.y)>prev.y?7:0].setPiece(undefined);
 
                             prevPiece.setMoved(true);
-                            currPiece.setMoved(true);
-                            updateState({game},""+PieceType[initialPiece.getPieceType()]+" - "+String.fromCharCode(65+this.position.y)+""+(this.position.x+1));
+                            currPiece?.setMoved(true);
+                            game.getMovesPlayed().push(new Move(
+                                game.getPlayers()[game.getCurrentTurn()],
+                                game.getBoard().getSpots()[initial.x][initial.y],
+                                this,
+                                undefined,
+                                true,
+                                prevPiece
+                            ));
+                            game.setCurrentTurn((game.getCurrentTurn()+1)%2);
+
+                            updateGame(game);
                             return;
                         }
                     }
@@ -69,12 +89,22 @@ export class Spot{
                 if(!initialPiece.canMove(prev,curr,game.getBoard().getSpots()))
                     return;
                         
-                        
-                        
                         game.getBoard().getSpots()[initial.x][initial.y].setPiece(undefined);
-                        game.getBoard().getSpots()[this.position.x][this.position.y].setPiece(initialPiece);
                         initialPiece.setMoved(true);
-                        updateState({game},""+PieceType[initialPiece.getPieceType()]+" - "+String.fromCharCode(65+this.position.y)+""+(this.position.x+1));
+                        game.setMovesPlayed([...game.getMovesPlayed()]);
+                        game.getMovesPlayed().push(new Move(
+                            game.getPlayers()[game.getCurrentTurn()],
+                            game.getBoard().getSpots()[initial.x][initial.y],
+                            this,
+                            game.getBoard().getSpots()[this.position.x][this.position.y].getPiece(),
+                            false,
+                            initialPiece
+                        ));
+                        game.getBoard().getSpots()[this.position.x][this.position.y].setPiece(initialPiece);
+
+                        game.setCurrentTurn((game.getCurrentTurn()+1)%2);
+
+                        updateGame(game);
 
                     }} 
                 onDragOver={(e)=>{
@@ -91,7 +121,6 @@ export class Spot{
         )
     }
 
-    private piece?:Piece ;
 
     constructor(x:number,y:number,piece?:Piece){
         this.position = {x,y};
