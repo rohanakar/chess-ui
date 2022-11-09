@@ -1,29 +1,25 @@
-import { render } from "@testing-library/react";
-import { useEffect, useState } from "react";
-import { Spot } from "../model/Spot";
-import BoardGenerator from "../utils/BoardGenerator";
+import { Spot } from "./Spot";
 import { render2DList } from "../utils/helper";
-import { Board as BoardModel } from "../model/Board";
+
+export class Board{
+
+    private spots: Spot[][] = [];
+
+
+    public getSpots(): Spot[][] {
+        return this.spots;
+    }
+
+    public setSpots(spots: Spot[][]): void {
+        this.spots = spots;
+    }
  
-const Board = (props: { board: BoardModel; }) => {
 
-    const board = props.board;
+    render = () => {
 
-    console.log("rendering board");
+       return render2DList(this.getSpots());
+
+    }
     
-    return (
-        <div className="board">
-            {
-                render2DList(board.getSpots())
-            }
-        </div>
-    )
-
+    
 }
-
-export default Board;
-
-
-
-
-

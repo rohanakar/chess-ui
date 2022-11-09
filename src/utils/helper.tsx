@@ -1,19 +1,19 @@
-import React from "react";
-import { Spot } from "../model/Spot";
+import { Spot } from "../components/Spot";
 
-export const renderList = (list:Array<Spot>,rowNum:number) => {
+export const renderList = (list:Spot[],rowNum:number) => {
     let op: any = [];
     let colNum=rowNum*8;;
     list.forEach(e=>{
-        op.push(e.render(colNum));
+        op.push(e.render());
         colNum++;
     })
     return (<div className="row" key={rowNum}>{op}</div>);
 }
 
-export const render2DList = (list:Array<Array<any>>) =>{
-    let op: Array<any> = [];
+export const render2DList = (list:any[][]) =>{
+    let op: any[] = [];
     let rowNum=0;
-    list.forEach(e=>op.push(renderList(e,rowNum++)));
+    for(let i=list.length-1;i>=0;i--)
+        op.push(renderList(list[i],rowNum++));
     return op;
 }
