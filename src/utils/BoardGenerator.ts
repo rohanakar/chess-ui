@@ -1,8 +1,8 @@
-import { Board } from "../model/Board";
+import { Board } from "../components/Board";
 import { King, Queen, Rook, Bishop, Pawn, Knight } from "../model/ChessPiece";
-import { Piece } from "../model/Piece";
+import { Piece } from "../components/Piece";
 import { PieceType } from "../model/PieceType";
-import { Spot } from "../model/Spot";
+import { Spot } from "../components/Spot";
 
 const getPiece = (piece: PieceType, isWhite: boolean) => {
     switch (piece) {
@@ -23,6 +23,11 @@ const getPiece = (piece: PieceType, isWhite: boolean) => {
 
 class BoardGenerator{
 
+    /*
+   
+      00 10 20
+    */
+
 
     private board : Board ;
     getBoard = () =>{
@@ -41,21 +46,24 @@ class BoardGenerator{
     generateFirstRow(type: number) {
 
         const row:Spot[] = [];
-        row.push(new Spot(getPiece(PieceType.ROOK,type===1?true:false)));
-        row.push(new Spot(getPiece(PieceType.KNIGHT,type===1?true:false)));
-        row.push(new Spot(getPiece(PieceType.BISHOP,type===1?true:false)));
-        row.push(new Spot(getPiece(PieceType.QUEEN,type===1?true:false)));
-        row.push(new Spot(getPiece(PieceType.KING,type===1?true:false)));
-        row.push(new Spot(getPiece(PieceType.BISHOP,type===1?true:false)));
-        row.push(new Spot(getPiece(PieceType.KNIGHT,type===1?true:false)));
-        row.push(new Spot(getPiece(PieceType.ROOK,type===1?true:false)));
+        const r = type==1?0:7;
+        let c = 0;
+        row.push(new Spot(r,c++,getPiece(PieceType.ROOK,type===1?true:false)));
+        row.push(new Spot(r,c++,getPiece(PieceType.KNIGHT,type===1?true:false)));
+        row.push(new Spot(r,c++,getPiece(PieceType.BISHOP,type===1?true:false)));
+        row.push(new Spot(r,c++,getPiece(PieceType.QUEEN,type===1?true:false)));
+        row.push(new Spot(r,c++,getPiece(PieceType.KING,type===1?true:false)));
+        row.push(new Spot(r,c++,getPiece(PieceType.BISHOP,type===1?true:false)));
+        row.push(new Spot(r,c++,getPiece(PieceType.KNIGHT,type===1?true:false)));
+        row.push(new Spot(r,c++,getPiece(PieceType.ROOK,type===1?true:false)));
         this.board.getSpots().push(row);
 
     }
     generateSecondRow(type: number) {
         const row:Spot[] = [];
+        const r = type==1?1:6;
         for(let i=0;i<8;i++){
-            row.push(new Spot(getPiece(PieceType.PAWN,type===1?true:false)));
+            row.push(new Spot(r,i,getPiece(PieceType.PAWN,type===1?true:false)));
         }
         this.board.getSpots().push(row);
     }
@@ -64,7 +72,7 @@ class BoardGenerator{
         for(let r=2;r<=5;r++){
             const row:Spot[] = [];
             for(let i=0;i<8;i++){
-                row.push(new Spot());
+                row.push(new Spot(r,i));
             }
             this.board.getSpots().push(row);
         }

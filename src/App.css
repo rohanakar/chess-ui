@@ -50,7 +50,7 @@
   width:45px;
 } 
 
-.even{
+.odd{
   background-color: #eeeed2;
 }
 
@@ -58,7 +58,7 @@
   fill: #565352 !important;
 }
 
-.odd {
+.even {
   background-color: #769656;
 
 }
@@ -76,3 +76,20 @@ path{
   position: absolute;
 }
 
+.board{
+  
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform:  translate(-50%,-50%) scale(1.15);
+}
+
+body{
+  background-color: #565352;
+}
+
+
+[draggable="true"] {
+  position: relative;
+  z-index: 1;
+}

@@ -1,13 +1,23 @@
-import { useState } from "react";
-import Board from "../components/Board";
-import { Game } from "../model/Game";
-
+import { useContext, useEffect, useState } from "react";
+import { Game } from "../components/Game";
+import { Player } from "../model/Player";
+import { AppContext } from "../redux/AppProvider";
+import { Prop } from "../types/PropTypes";
 
 const Main = () => {
-    
-    const [game,setGame] = useState(new Game())
 
-    return (<Board board={game.getBoard()}/>)
+    const [state,,,undo,redo] = useContext(AppContext);
+
+    const handleKeyDown = (e:any) => {
+        if(e.key === 'ArrowLeft'){
+            undo();
+        }else if(e.key === 'ArrowRight'){
+            redo();
+        }
+    }
+
+    let game:Game =state.curr;
+    return <div tabIndex={0} onKeyDown={handleKeyDown}>{game&&game.render()}</div>;
     
 }
 
